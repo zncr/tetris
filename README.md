@@ -30,3 +30,5 @@ Features: 7-bag randomizer, ghost piece, hold, next preview, levels and speed-up
 ## Moon in the daytime simulation
 
 Open `moon-daytime.html` for an interactive simulation of why the Moon is sometimes visible during the day.
+
+For little kids, open `moon-kids.html`: big buttons, a smiling Sun and Moon, and a voice that narrates.
