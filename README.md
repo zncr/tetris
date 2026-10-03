@@ -26,3 +26,7 @@ python3 -m http.server 8000   # then visit http://localhost:8000
 Touch buttons appear on touch devices.
 
 Features: 7-bag randomizer, ghost piece, hold, next preview, levels and speed-up, high score saved in localStorage.
+
+## Moon in the daytime simulation
+
+Open `moon-daytime.html` for an interactive simulation of why the Moon is sometimes visible during the day.

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why the Moon Shows Up in Daytime</title>
+<style>
+  :root { --bg:#0f1220; --panel:#1a1f36; --text:#e8ebff; --muted:#a3a9cc; --accent:#6c8cff; --good:#4cd98a; --warn:#ffb84d; --bad:#ff6b6b; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:system-ui,sans-serif; line-height:1.5; }
+  main { max-width:1100px; margin:0 auto; padding:20px 16px 40px; }
+  h1 { font-size:24px; margin:0 0 4px; }
+  .lead { color:var(--muted); margin:0 0 16px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:820px) { .grid { grid-template-columns:1fr; } }
+  .card { background:var(--panel); border-radius:10px; padding:12px; }
+  .card h2 { font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 8px; font-weight:600; }
+  canvas { width:100%; height:auto; display:block; border-radius:6px; }
+  .controls { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px 20px; margin-top:16px; }
+  label { display:block; font-size:13px; color:var(--muted); }
+  label b { color:var(--text); font-weight:600; }
+  input[type=range] { width:100%; accent-color:var(--accent); }
+  .row { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; align-items:center; }
+  button { background:#2a3052; color:var(--text); border:0; border-radius:6px; padding:8px 12px; font-size:13px; cursor:pointer; }
+  button:hover { background:#353d69; }
+  button.primary { background:var(--accent); color:#fff; }
+  #status { margin-top:16px; padding:12px 14px; border-radius:10px; background:var(--panel); border-left:6px solid var(--muted); }
+  #status strong { display:block; font-size:17px; margin-bottom:2px; }
+  #status.good { border-color:var(--good); } #status.warn { border-color:var(--warn); } #status.bad { border-color:var(--bad); }
+  ol { margin:8px 0 0; padding-left:20px; color:var(--muted); } ol li { margin:4px 0; } ol b { color:var(--text); }
+  .check { display:flex; align-items:center; gap:6px; color:var(--text); font-size:13px; }
+  small { color:var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Why can we see the Moon in the daytime?</h1>
+  <p class="lead">The Moon is always there, orbiting Earth once every ~29.5 days. Move the sliders or press play to see when it is above your horizon, lit by the Sun, and bright enough to spot.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Space view (looking down on the North Pole)</h2>
+      <canvas id="orbit" width="600" height="600"></canvas>
+    </div>
+    <div class="card">
+      <h2>What you see in the sky</h2>
+      <canvas id="sky" width="600" height="340"></canvas>
+      <h2 style="margin-top:12px">Your day (click the bar to jump to a time)</h2>
+      <canvas id="timeline" width="600" height="90" style="cursor:pointer"></canvas>
+      <div class="row">
+        <small><span style="color:#2f7fe0">■</span> daytime &nbsp; <span style="color:#0b1030;text-shadow:0 0 1px #888">■</span> night &nbsp; <span style="color:#ffd84d">■</span> Moon visible in daylight &nbsp; <span style="color:#7a7f99">■</span> Moon up at night</small>
+      </div>
+    </div>
+  </div>
+
+  <div id="status"><strong id="stTitle"></strong><span id="stBody"></span></div>
+
+  <div class="controls">
+    <label>Moon phase: <b id="phaseName"></b> (day <span id="dayVal"></span> of 29.5)
+      <input type="range" id="day" min="0" max="29.5" step="0.1" value="7.4"></label>
+    <label>Time of day: <b id="hourVal"></b>
+      <input type="range" id="hour" min="0" max="24" step="0.05" value="15"></label>
+    <label>Animation speed: <b id="spdVal"></b>
+      <input type="range" id="speed" min="0.5" max="8" step="0.5" value="2"></label>
+    <div>
+      <div class="row" style="margin-top:0">
+        <button class="primary" id="play">▶ Play</button>
+        <label class="check"><input type="checkbox" id="atmo" checked> Earth has an atmosphere</label>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <small>Try:</small>
+    <button data-d="7.4" data-h="15">Afternoon, half moon</button>
+    <button data-d="22.1" data-h="9">Morning, half moon</button>
+    <button data-d="3.5" data-h="17">Thin crescent</button>
+    <button data-d="14.8" data-h="12">Full moon at noon</button>
+    <button data-d="0" data-h="12">New moon at noon</button>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>The idea in four steps</h2>
+    <ol>
+      <li><b>The Moon is above your horizon about 12 hours every day</b> — just like the Sun — because Earth spins once a day. Those 12 hours are not always at night.</li>
+      <li><b>The Sun lights half the Moon.</b> Sunlight keeps shining on the Moon whether or not it is dark where you stand. The lit part is what you see as the phase.</li>
+      <li><b>Daytime sky is only bright because of the atmosphere.</b> Air scatters blue light everywhere. Turn off the atmosphere above and the sky goes black, even at noon.</li>
+      <li><b>The Moon is brighter than that blue sky</b> as long as a good chunk of it is lit. Its "moonrise" shifts ~50 minutes later each day, so it spends part of the daytime above the horizon on most days: afternoons for a waxing Moon, mornings for a waning one. The exceptions are near full (it rises as the Sun sets) and near new (lit side faces away and it sits next to the Sun).</li>
+    </ol>
+    <p><small>Simplified model: you are on the equator and the Moon orbits in the same plane as the Sun's path, so everything follows the same east-to-west arc. Real skies are tilted, but the timing story is the same.</small></p>
+  </div>
+</main>
+
+<script>
+const D2R = Math.PI / 180, TAU = Math.PI * 2, SYNODIC = 29.53;
+const $ = id => document.getElementById(id);
+const oc = $('orbit').getContext('2d'), sc = $('sky').getContext('2d'), tc = $('timeline').getContext('2d');
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const rot = (v, a) => [v[0]*Math.cos(a) - v[1]*Math.sin(a), v[0]*Math.sin(a) + v[1]*Math.cos(a)];
+const dot = (a, b) => a[0]*b[0] + a[1]*b[1];
+const mix = (a, b, k) => a.map((v, i) => Math.round(v + (b[i] - v) * k));
+const rgb = c => `rgb(${c[0]},${c[1]},${c[2]})`;
+const SUN_DIR = [-1, 0];          // Sun is to the left in the space view
+const MIN_ILLUM = 0.04, THIN = 0.15;
+
+let day = 7.4, hour = 15, playing = false, atmo = true, last = 0;
+const stars = Array.from({ length: 140 }, () => ({ x: Math.random(), y: Math.random(), r: Math.random() * 1.2 + 0.3 }));
+
+// ---- geometry --------------------------------------------------------------
+function geometry(d, h) {
+  const elong = (d / SYNODIC) * TAU;                   // angle Sun -> Moon as seen from Earth
+  const moonDir = rot(SUN_DIR, elong);
+  const n = rot(SUN_DIR, (h - 12) * 15 * D2R);         // outward normal at the observer
+  const east = rot(n, Math.PI / 2);
+  return {
+    elong, moonDir, n, east,
+    illum: (1 - Math.cos(elong)) / 2,
+    sunAlt: dot(n, SUN_DIR), moonAlt: dot(n, moonDir),   // sine of altitude
+  };
+}
+function phaseName(d) {
+  const f = d / SYNODIC;
+  const names = ['New Moon', 'Waxing crescent', 'First quarter', 'Waxing gibbous', 'Full Moon', 'Waning gibbous', 'Last quarter', 'Waning crescent'];
+  return names[Math.round(f * 8) % 8];
+}
+function fmtTime(h) {
+  h = ((h % 24) + 24) % 24;
+  let hh = Math.floor(h), mm = Math.round((h - hh) * 60);
+  if (mm === 60) { mm = 0; hh = (hh + 1) % 24; }
+  const ap = hh >= 12 ? 'PM' : 'AM', h12 = hh % 12 || 12;
+  return `${h12}:${String(mm).padStart(2, '0')} ${ap}`;
+}
+function verdict(g) {
+  const sunUp = g.sunAlt > 0, moonUp = g.moonAlt > 0;
+  if (!moonUp) return { cls: 'bad', t: 'The Moon is below your horizon right now', b: sunUp ? 'It is daytime, but the Moon is on the other side of Earth from you. Wait a few hours or change the phase.' : 'It is night and the Moon has not risen yet (or has set).' };
+  if (!sunUp) return { cls: 'good', t: 'Night: the Moon is up (the usual case)', b: 'The sky is dark, so even a thin Moon stands out.' };
+  if (g.illum < MIN_ILLUM) return { cls: 'bad', t: 'Above the horizon, but practically invisible', b: 'Near new Moon the lit side faces away from Earth, and the Moon sits right beside the Sun in the sky.' };
+  if (g.illum < THIN) return { cls: 'warn', t: 'Up in the daytime, but a hard-to-spot thin crescent', b: 'Only a sliver is lit and it is close to the Sun\'s glare. Look away from the Sun, on a clear day.' };
+  if (!atmo) return { cls: 'good', t: 'Visible — and the sky is black', b: 'With no atmosphere there is nothing to scatter sunlight, so the sky stays dark even at noon.' };
+  return { cls: 'good', t: 'Visible in the daytime!', b: 'The Moon is above your horizon and a good part of it is lit by the Sun. Sunlight reflected by the Moon is brighter than the scattered blue of the sky around it.' };
+}
+
+// ---- drawing ---------------------------------------------------------------
+function drawMoon(c, x, y, r, elong, angle, skyB) {
+  c.save(); c.translate(x, y); c.rotate(angle);
+  c.fillStyle = `rgba(80,86,110,${0.06 + 0.35 * (1 - skyB)})`;
+  c.beginPath(); c.arc(0, 0, r, 0, TAU); c.fill();
+  const cs = Math.cos(elong);
+  c.beginPath(); c.moveTo(0, -r); c.arc(0, 0, r, -Math.PI / 2, Math.PI / 2, false);
+  for (let t = Math.PI / 2; t >= -Math.PI / 2 - 1e-6; t -= 0.1) c.lineTo(r * cs * Math.cos(t), r * Math.sin(t));
+  c.closePath(); c.shadowColor = 'rgba(255,250,220,.7)'; c.shadowBlur = r * 0.5;
+  c.fillStyle = '#f6f2df'; c.fill(); c.restore();
+}
+function drawOrbit(g) {
+  const c = oc, cx = 300, cy = 300, R = 46, OR = 205;
+  c.clearRect(0, 0, 600, 600); c.fillStyle = '#070914'; c.fillRect(0, 0, 600, 600);
+  c.strokeStyle = 'rgba(255,214,102,.13)'; c.lineWidth = 1.5;
+  for (let y = 40; y <= 560; y += 40) { c.beginPath(); c.moveTo(70, y); c.lineTo(590, y); c.stroke(); }
+  const gl = c.createRadialGradient(10, cy, 10, 10, cy, 130);
+  gl.addColorStop(0, 'rgba(255,200,60,.8)'); gl.addColorStop(1, 'rgba(255,200,60,0)');
+  c.fillStyle = gl; c.fillRect(0, 150, 150, 300);
+  c.fillStyle = '#ffcc33'; c.beginPath(); c.arc(8, cy, 42, 0, TAU); c.fill();
+  c.fillStyle = '#9aa0c8'; c.font = '13px system-ui'; c.fillText('Sun', 30, cy - 52); c.fillText('sunlight →', 62, cy + 70);
+  c.setLineDash([4, 6]); c.strokeStyle = 'rgba(255,255,255,.22)'; c.beginPath(); c.arc(cx, cy, OR, 0, TAU); c.stroke(); c.setLineDash([]);
+  // Earth
+  c.fillStyle = '#10244d'; c.beginPath(); c.arc(cx, cy, R, 0, TAU); c.fill();
+  c.fillStyle = '#2f6fe0'; c.beginPath(); c.arc(cx, cy, R, Math.PI / 2, Math.PI * 1.5); c.fill();
+  c.fillStyle = '#cdd3ff'; c.fillText('Earth', cx - 17, cy + R + 18);
+  c.fillStyle = '#7f89c9'; c.font = '11px system-ui'; c.fillText('day side', cx - R - 4 - 44, cy + 4); c.fillText('night', cx + R + 6, cy + 4);
+  // Moon (lit half faces the Sun)
+  const mx = cx + g.moonDir[0] * OR, my = cy - g.moonDir[1] * OR;
+  c.fillStyle = '#4a4d5c'; c.beginPath(); c.arc(mx, my, 17, 0, TAU); c.fill();
+  c.fillStyle = '#f1eedc'; c.beginPath(); c.arc(mx, my, 17, Math.PI / 2, Math.PI * 1.5); c.fill();
+  c.fillStyle = '#cdd3ff'; c.font = '13px system-ui'; c.fillText('Moon', mx - 17, my - 24);
+  // observer
+  const ox = cx + g.n[0] * R, oy = cy - g.n[1] * R;
+  c.strokeStyle = '#ffd166'; c.lineWidth = 2;
+  c.beginPath(); c.moveTo(ox - g.east[0] * 42, oy + g.east[1] * 42); c.lineTo(ox + g.east[0] * 42, oy - g.east[1] * 42); c.stroke();
+  c.setLineDash([6, 5]); c.lineWidth = 2; c.strokeStyle = g.moonAlt > 0 ? '#4cd98a' : 'rgba(255,107,107,.6)';
+  c.beginPath(); c.moveTo(ox, oy); c.lineTo(mx, my); c.stroke(); c.setLineDash([]);
+  c.fillStyle = '#ff5d73'; c.beginPath(); c.arc(ox, oy, 6, 0, TAU); c.fill();
+  c.fillStyle = '#ffd166'; c.font = '12px system-ui'; c.fillText('You', ox + g.n[0] * 14 - 10, oy - g.n[1] * 14 + 4);
+  c.fillStyle = '#7f89c9'; c.fillText('yellow line = your horizon · green dashes = Moon is above it, red = below', 20, 584);
+}
+function skyColors(sa) {
+  const night = [[4, 6, 26], [11, 16, 48]], twi = [[58, 63, 120], [240, 138, 75]], dayc = [[47, 127, 224], [159, 208, 255]];
+  if (sa < 0) { const k = clamp((sa + 0.2) / 0.2, 0, 1); return [mix(night[0], twi[0], k), mix(night[1], twi[1], k)]; }
+  const k = clamp(sa / 0.35, 0, 1); return [mix(twi[0], dayc[0], k), mix(twi[1], dayc[1], k)];
+}
+function drawSky(g) {
+  const c = sc, W = 600, H = 340, hz = 292, cx = 300, AW = 265, AH = 255;
+  const [top, hor] = atmo ? skyColors(g.sunAlt) : [[0, 0, 0], [0, 0, 0]];
+  const skyB = atmo ? clamp((g.sunAlt + 0.2) / 0.55, 0, 1) : 0;
+  const grad = c.createLinearGradient(0, 0, 0, hz); grad.addColorStop(0, rgb(top)); grad.addColorStop(1, rgb(hor));
+  c.fillStyle = grad; c.fillRect(0, 0, W, hz);
+  const starA = atmo ? 1 - skyB : 1;
+  if (starA > 0.02) { c.fillStyle = `rgba(255,255,255,${0.9 * starA})`; stars.forEach(s => { c.beginPath(); c.arc(s.x * W, s.y * (hz - 6), s.r, 0, TAU); c.fill(); }); }
+  const pos = d => [cx + dot(d, g.east) * AW, hz - dot(d, g.n) * AH];
+  const sp = pos(SUN_DIR), mp = pos(g.moonDir);
+  if (g.sunAlt > 0) {
+    if (atmo) { const sg = c.createRadialGradient(sp[0], sp[1], 10, sp[0], sp[1], 110); sg.addColorStop(0, 'rgba(255,240,180,.6)'); sg.addColorStop(1, 'rgba(255,240,180,0)'); c.fillStyle = sg; c.fillRect(sp[0] - 110, sp[1] - 110, 220, 220); }
+    c.fillStyle = '#fff4b0'; c.beginPath(); c.arc(sp[0], sp[1], 18, 0, TAU); c.fill();
+  }
+  if (g.moonAlt > 0) drawMoon(c, mp[0], mp[1], 22, g.elong, Math.atan2(sp[1] - mp[1], sp[0] - mp[0]), skyB);
+  c.fillStyle = `rgb(${Math.round(20 + 22 * skyB)},${Math.round(30 + 40 * skyB)},${Math.round(24 + 20 * skyB)})`; c.fillRect(0, hz, W, H - hz);
+  c.fillStyle = 'rgba(255,255,255,.75)'; c.font = '12px system-ui';
+  if (g.sunAlt > 0) c.fillText('Sun', sp[0] - 10, sp[1] + 34);
+  if (g.moonAlt > 0) c.fillText('Moon', mp[0] - 14, mp[1] + 40);
+  c.fillText('W', 10, hz + 22); c.fillText('E', W - 20, hz + 22); c.fillText('horizon', cx - 22, hz + 22);
+  if (g.moonAlt <= 0) { c.font = '13px system-ui'; c.fillStyle = 'rgba(255,255,255,.85)'; c.fillText('Moon is below the horizon', cx - 85, 40); }
+}
+function states(h) {
+  const g = geometry(day, h);
+  return { sunUp: g.sunAlt > 0, moonUp: g.moonAlt > 0, vis: g.sunAlt > 0 && g.moonAlt > 0 && g.illum >= MIN_ILLUM };
+}
+function drawTimeline() {
+  const c = tc, W = 600, bx = 10, bw = W - 20, by = 22, bh = 34;
+  c.clearRect(0, 0, W, 90); let visHours = 0;
+  for (let i = 0; i < bw; i++) {
+    const h = (i / bw) * 24, s = states(h);
+    c.fillStyle = s.sunUp ? '#2f7fe0' : '#0b1030'; c.fillRect(bx + i, by, 1.5, bh);
+    if (s.moonUp) { c.fillStyle = s.vis ? '#ffd84d' : '#7a7f99'; c.fillRect(bx + i, by + bh - 12, 1.5, 12); }
+    if (s.vis) visHours += 24 / bw;
+  }
+  c.fillStyle = '#a3a9cc'; c.font = '11px system-ui';
+  ['12 AM', '6 AM', '12 PM', '6 PM', '12 AM'].forEach((t, i) => c.fillText(t, bx + (i / 4) * bw - (i === 4 ? 30 : i === 0 ? 0 : 14), by + bh + 16));
+  const x = bx + (hour / 24) * bw;
+  c.fillStyle = '#ff5d73'; c.fillRect(x - 1, by - 8, 3, bh + 16);
+  c.fillStyle = '#e8ebff'; c.font = '12px system-ui';
+  c.fillText(visHours > 0.05 ? `Moon visible in daylight about ${visHours.toFixed(1)} h on this day` : 'Moon is not visible in daylight on this day', bx, 14);
+}
+
+// ---- main update -----------------------------------------------------------
+function update() {
+  const g = geometry(day, hour), v = verdict(g);
+  drawOrbit(g); drawSky(g); drawTimeline();
+  $('status').className = v.cls; $('stTitle').textContent = v.t; $('stBody').textContent = v.b;
+  $('phaseName').textContent = `${phaseName(day)}, ${Math.round(g.illum * 100)}% lit`;
+  $('dayVal').textContent = day.toFixed(1); $('hourVal').textContent = fmtTime(hour);
+  $('spdVal').textContent = `${$('speed').value} hours per second`;
+  $('day').value = day; $('hour').value = hour;
+}
+function tick(t) {
+  const dt = Math.min(0.1, (t - last) / 1000); last = t;
+  if (playing) {
+    const dh = dt * +$('speed').value;
+    hour += dh; day += dh / 24;
+    if (hour >= 24) hour -= 24;
+    if (day >= SYNODIC) day -= SYNODIC;
+    update();
+  }
+  requestAnimationFrame(tick);
+}
+$('day').addEventListener('input', e => { day = +e.target.value; update(); });
+$('hour').addEventListener('input', e => { hour = +e.target.value; update(); });
+$('speed').addEventListener('input', update);
+$('atmo').addEventListener('change', e => { atmo = e.target.checked; update(); });
+$('play').addEventListener('click', () => { playing = !playing; $('play').textContent = playing ? '⏸ Pause' : '▶ Play'; });
+document.querySelectorAll('button[data-d]').forEach(b => b.addEventListener('click', () => { day = +b.dataset.d; hour = +b.dataset.h; update(); }));
+$('timeline').addEventListener('click', e => {
+  const r = e.target.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * 600;
+  hour = clamp((x - 10) / 580, 0, 1) * 24; update();
+});
+update(); requestAnimationFrame(tick);
+</script>
+</body>
+</html>
